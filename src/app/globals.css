@@ -24,3 +24,12 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.global-pattern-background {
+  background-color: #ffffff;
+  background-image: url('/bg_pattern.svg');
+  background-size: 25px 25px;
+  background-repeat: repeat;
+  background-position: center;
+  /* Add width/height/padding as needed where you use the class */
+}
