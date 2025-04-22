@@ -1,10 +1,11 @@
+// src/app/layout.tsx
 import type { Metadata } from "next";
 import "./globals.css";
-import { abcFavorit } from "./fonts";
+import { abcFavorit, abcDiatype, geist } from "./fonts"; // Added abcDiatype
 
 export const metadata: Metadata = {
-  title: "Tendy - Wallet Infrastructure for Every User",
-  description: "Tendy makes it easy to build on crypto rails. Spin up wallets, sign transactions, and integrate onchain infrastructure—all through one simple API.",
+  title: "KoaHill",
+  description: "KoaHill is a platform for startups to access public sector funding.",
 };
 
 export default function RootLayout({
@@ -13,8 +14,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={abcFavorit.variable}>
-      <body className="font-abc-favorit" suppressHydrationWarning>{children}</body>
+    // Apply all font variables to the html tag so they are globally available
+    <html lang="en" className={`${abcFavorit.variable} ${abcDiatype.variable} ${geist.variable}`}>
+      {/* Remove font-geist class here. Tailwind base styles will apply font-sans (now Geist) */}
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }

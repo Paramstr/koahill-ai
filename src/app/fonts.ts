@@ -1,27 +1,28 @@
 import localFont from 'next/font/local'
 
 export const abcFavorit = localFont({
-  src: [
-    {
-      path: './fonts/ABCFavorit-Light-Trial.otf',
-      weight: '300',
-      style: 'normal',
-    },
-    {
-      path: './fonts/ABCFavorit-Regular-Trial.otf',
-      weight: '400',
-      style: 'normal',
-    },
-    {
-      path: './fonts/ABCFavorit-Medium-Trial.otf',
-      weight: '500',
-      style: 'normal',
-    },
-    {
-      path: './fonts/ABCFavorit-Bold-Trial.otf',
-      weight: '700',
-      style: 'normal',
-    },
-  ],
+  src: './fonts/ABCFavoritExpandedVariable-Trial.ttf',
   variable: '--font-abc-favorit',
-}) 
+  display: 'swap',
+})
+
+export const abcDiatype = localFont({
+  src: './fonts/ABCDiatypeVariable-Trial.ttf',
+  variable: '--font-abc-diatype',
+  display: 'swap',
+})
+
+export const geist = localFont({
+  src: './fonts/Geist[wght].ttf',
+  variable: '--font-geist',
+  display: 'swap',
+})
+
+// If you plan to use the italic version separately:
+// export const geistItalic = localFont({
+//   src: './fonts/Geist-Italic[wght].ttf',
+//   variable: '--font-geist-italic',
+//   style: 'italic',
+//   display: 'swap',
+//   // weight: '100 900'
+// }); 

@@ -5,12 +5,28 @@
   --foreground: #171717;
 }
 
+/* Keep your color variables */
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  /* You might want to define fallbacks here too if needed elsewhere */
+  --font-fallback: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+/*
+   Remove or clarify the purpose of this block.
+   If you NEED it for a specific tool, ensure the variable name matches
+   what next/font generates (e.g., --font-geist).
+   Otherwise, delete it.
+*/
+/*
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --font-sans: var(--font-geist-sans); /* <<< Likely incorrect variable name */
+  /* --font-mono: var(--font-geist-mono); */
+/* }
+*/
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -19,17 +35,24 @@
   }
 }
 
+/*
+   REMOVE this body rule entirely. Tailwind's base styles will handle
+   applying the default font-family based on your tailwind.config.ts
+*/
+/*
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+  font-family: Arial, Helvetica, sans-serif; /* <<< REMOVE THIS LINE */
+/* }
+*/
 
+
+/* Keep your utility classes */
 .global-pattern-background {
   background-color: #ffffff;
   background-image: url('/bg_pattern.svg');
   background-size: 25px 25px;
   background-repeat: repeat;
   background-position: center;
-  /* Add width/height/padding as needed where you use the class */
 }

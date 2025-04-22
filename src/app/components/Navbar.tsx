@@ -8,7 +8,7 @@ const Navbar = () => {
           {/* Logo - Centered using absolute positioning */}
           <div className="absolute left-1/2 transform -translate-x-1/2">
             <Link href="/" className="flex items-center">
-              <span className="font-bold text-xl text-gray-900">KOA HILL</span>
+              <span className="font-bold text-xl text-gray-900">Granthill</span>
             </Link>
           </div>
 
