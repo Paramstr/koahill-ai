@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@mendable/firecrawl-js": "^1.24.0",
     "framer-motion": "^12.7.4",
     "next": "latest",
     "react": "latest",

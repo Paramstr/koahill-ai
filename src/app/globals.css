@@ -56,3 +56,27 @@ body {
   background-repeat: repeat;
   background-position: center;
 }
+
+/* Add these new classes */
+.fade-background-rect {
+  position: relative;
+}
+
+.fade-background-rect::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 0.5rem; /* Matches rounded-lg */
+  background-color: rgba(255, 255, 255, 0.7); /* Matches bg-white/90 */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 50%, transparent 100%),
+                      linear-gradient(to right, transparent 0%, black 20%, black 50%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 50%, transparent 100%),
+              linear-gradient(to right, transparent 0%, black 20%, black 50%, transparent 100%);
+  -webkit-mask-composite: intersect;
+  mask-composite: intersect;
+}
+
+.content-above {
+  position: relative;
+  z-index: 1; /* Ensures content is above the ::before pseudo-element */
+}

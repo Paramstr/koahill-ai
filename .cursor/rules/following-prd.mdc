@@ -1,0 +1,100 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# LLM Agent PRD Loading Rule
+
+## Trigger Patterns
+The agent will check for these patterns at the start of any conversation:
+- `prd recent` - Load the most recently updated PRD
+- `prd {name}` - Load the specific PRD with the matching name
+
+## File Structure
+All PRD files must be located in the `/prd` directory:
+- Individual PRD files: `/prd/{prd_name}.md`
+- Status tracking file: `/prd/prd_status.md`
+
+## Processing Logic
+
+### When conversation starts with "prd recent":
+1. Parse `/prd/prd_status.md` to identify the most recently modified PRD
+2. Load the corresponding PRD file from `/prd/{most_recent_prd}.md`
+3. Use the PRD content as context for the conversation
+
+### When conversation starts with "prd {name}":
+1. Check if `/prd/{name}.md` exists
+2. If found, load the PRD file content as context
+3. If not found, inform the user the specified PRD doesn't exist
+
+## Status Tracking File Format
+
+The `/prd/prd_status.md` file maintains a structured record of all PRDs:
+
+```markdown
+# LLM Agent PRD Loading Rule
+
+## Trigger Patterns
+The agent will check for these patterns at the start of any conversation:
+- `prd recent` - Load the most recently updated PRD
+- `prd {name}` - Load the specific PRD with the matching name
+
+## File Structure
+All PRD files must be located in the `/prd` directory:
+- Individual PRD files: `/prd/{prd_name}.md`
+- Status tracking file: `/prd/prd_status.md`
+
+## Processing Logic
+
+### When conversation starts with "prd recent":
+1. Parse `/prd/prd_status.md` to identify the most recently modified PRD
+2. Load the corresponding PRD file from `/prd/{most_recent_prd}.md`
+3. Use the PRD content as context for the conversation
+
+### When conversation starts with "prd {name}":
+1. Check if `/prd/{name}.md` exists
+2. If found, load the PRD file content as context
+3. If not found, inform the user the specified PRD doesn't exist
+
+## Status Tracking File Format
+
+The `/prd/prd_status.md` file maintains a structured record of all PRDs:
+
+```markdown
+# PRD Status Tracking
+
+## instant-grant-match
+- **Created**: 2025-04-15
+- **Last Modified**: 2025-04-20
+- **Status**: 🟡 In Progress
+- **Path**: [/prd/instant-grant-match.md](/prd/instant-grant-match.md)
+
+## user-auth
+- **Created**: 2025-04-10
+- **Last Modified**: 2025-04-18
+- **Status**: 🔵 Planning
+- **Path**: [/prd/user-auth.md](/prd/user-auth.md)
+```
+
+## Status Emoji Legend
+- ✅ **Completed** - All tasks finished
+- 🟡 **In Progress** - Work actively underway
+- 🔵 **Planning** - Requirements gathering stage
+- 🔴 **Needs Attention** - Blocked or requires review
+- ⚪ **Not Started** - Tasks identified but work not begun
+
+## Implementation Notes
+- The agent should track progress against the todo items in each PRD section
+- PRDs are structured with clear sections and checklists for implementation tracking
+- Each section contains specific, actionable todo items with checkboxes
+- When items are completed, the agent should update the status ([ ] → [x])
+- The status tracking file helps maintain awareness of all active PRDs
+
+```
+
+## Implementation Notes
+- The agent should track progress against the todo items in each PRD section
+- PRDs are structured with clear sections and checklists for implementation tracking
+- Each section contains specific, actionable todo items with checkboxes
+- When items are completed, the agent should update the status ([ ] → [x])
+- The status tracking file helps maintain awareness of all active PRDs
