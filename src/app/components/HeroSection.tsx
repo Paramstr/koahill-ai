@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PencilLine } from 'lucide-react';
 import { Banknote, Calendar, MapPin, Layers } from 'lucide-react';
@@ -61,6 +61,8 @@ const HeroSection = () => {
   const [isFundingLoading, setIsFundingLoading] = useState(false);
   const [fundingError, setFundingError] = useState<string | null>(null);
 
+  const missionTextareaRef = useRef<HTMLTextAreaElement>(null); // Create ref for mission textarea
+
   useEffect(() => {
     const intervalId = setInterval(() => {
       setIndex((prevIndex) => (prevIndex + 1) % texts.length);
@@ -68,6 +70,14 @@ const HeroSection = () => {
 
     return () => clearInterval(intervalId); // Cleanup interval on component unmount
   }, []);
+
+  useEffect(() => {
+    // Adjust textarea height when mission changes
+    if (missionTextareaRef.current && extractedData?.mission) {
+      missionTextareaRef.current.style.height = 'auto'; // Reset height to correctly calculate scrollHeight
+      missionTextareaRef.current.style.height = `${missionTextareaRef.current.scrollHeight}px`;
+    }
+  }, [extractedData?.mission]); // Run when mission changes
 
   const handleCheckEligibility = async () => {
     if (!websiteUrl) {
@@ -335,11 +345,12 @@ const HeroSection = () => {
                 </div>
                 
                 <textarea
+                  ref={missionTextareaRef} // Attach ref
                   value={extractedData.mission}
                   onChange={(e) => handleEdit('mission', e.target.value)}
-                  className={`content-above w-full bg-transparent outline-none text-gray-700 resize-none mb-0 ${isNotFound(extractedData.mission) ? 'text-red-600 underline decoration-red-600' : ''}`}
+                  className={`content-above w-full bg-transparent outline-none text-gray-700 resize-none mb-0 overflow-hidden ${isNotFound(extractedData.mission) ? 'text-red-600 underline decoration-red-600' : ''}`} // Added overflow-hidden
                   placeholder="Company mission"
-                  // rows={3}
+                  rows={1} // Start with one row, height will adjust
                 />
                 {isNotFound(extractedData.mission) && <PencilLine className="ml-2 text-red-600 inline-block align-middle" size={16} />}
                 
