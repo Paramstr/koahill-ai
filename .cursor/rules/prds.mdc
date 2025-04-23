@@ -1,0 +1,39 @@
+---
+description: PRDs
+globs: 
+alwaysApply: false
+---
+# PRD Management for LLMs
+
+## Setting up PRDs
+- Store PRDs in `./prd` directory
+- Maintain `prd_status.md` for tracking
+- Individual PRDs as `{name}.md`
+- Prefix filenames with status emoji:
+  - 🟡 for in-progress PRDs
+  - ✅ for completed PRDs
+
+## Searching for PRDs
+- If user requests specific PRD, search `/prd` folder by name
+- If user asks for "current" or "most recent" PRD, locate file with 🟡 prefix
+- Parse `prd_status.md` if needed for additional context
+
+## Updating PRDs and Status
+- Update PRDs by marking todo items: `[ ]` → `[x]`
+- Add new steps with clear, non-redundant language
+- Keep updates concise and maintain readability
+- When PRD completes, update:
+  1. Change prefix from 🟡 to ✅
+  2. Update status in `prd_status.md`
+
+## PRD Status Template
+
+```markdown
+# {PRD_NAME}
+
+- **Description**: Brief overview of what this PRD covers
+- **Location**: /prd/{filename}.md
+- **Status**: 🟡 In Progress
+- **Created**: DD-MM-YYYY
+- **Last Updated**: DD-MM-YYYY
+```

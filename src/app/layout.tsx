@@ -4,8 +4,8 @@ import "./globals.css";
 import { abcFavorit, abcDiatype, geist } from "./fonts"; // Added abcDiatype
 
 export const metadata: Metadata = {
-  title: "KoaHill",
-  description: "KoaHill is a platform for startups to access public sector funding.",
+  title: "Openly Funded",
+  description: "Openly Funded is a platform to access public funding.",
 };
 
 export default function RootLayout({

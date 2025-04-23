@@ -1,15 +1,12 @@
 # PRD Status Tracking
 
 ## grantMatchFromURL
-- **Created**: YYYY-MM-DD
-- **Last Modified**: YYYY-MM-DD
-- **Status**: ⚪ Not Started
-- **Path**: [/prd/grantMatchFromURL.md](/prd/grantMatchFromURL.md)
+- **Created**: 2025-04-23
+- **Last Modified**: 2025-04-23
+- **Status**: 🟡 In Progress
+- **Path**: /prd/🟨 grantMatchFromURL.md
 
 ---
 ## Status Emoji Legend
 - ✅ **Completed** - All tasks finished
 - 🟡 **In Progress** - Work actively underway
-- 🔵 **Planning** - Requirements gathering stage
-- 🔴 **Needs Attention** - Blocked or requires review
-- ⚪ **Not Started** - Tasks identified but work not begun 

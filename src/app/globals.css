@@ -67,11 +67,11 @@ body {
   position: absolute;
   inset: 0;
   border-radius: 0.5rem; /* Matches rounded-lg */
-  background-color: rgba(255, 255, 255, 0.7); /* Matches bg-white/90 */
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 50%, transparent 100%),
-                      linear-gradient(to right, transparent 0%, black 20%, black 50%, transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 50%, transparent 100%),
-              linear-gradient(to right, transparent 0%, black 20%, black 50%, transparent 100%);
+  background-color: rgba(255, 0, 0, 0.7); /* Increased opacity */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 70%, transparent 100%),
+                      linear-gradient(to right, transparent 0%, black 30%, black 70%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 60%, black 60%, transparent 100%),
+              linear-gradient(to right, transparent 0%, black 30%, black 60%, transparent 100%);
   -webkit-mask-composite: intersect;
   mask-composite: intersect;
 }

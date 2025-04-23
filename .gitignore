@@ -41,5 +41,8 @@ public/DINAMO Trial Fonts.zip
 # *.woff2
 # *.ttf
 
-# Large image files
+# vscode workspace
+.vscode
 
+# code workspace
+.code-workspace

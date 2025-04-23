@@ -49,9 +49,17 @@ export async function POST(req: NextRequest) {
     // Assuming the result data structure matches the schema and you want the first result
     const extractedData = extractResult.data;
 
-    // --- Add detailed logging --- 
-    console.log("API Route: Extracted data object:", JSON.stringify(extractedData)); 
-    console.log("API Route: Checking condition (!extractedData):", !extractedData);
+    // Set any missing fields to "Empty"
+    if (extractedData) {
+      const requiredFields = ["company_name", "mission", "location", "tags"];
+      for (const field of requiredFields) {
+        if (!extractedData[field] || 
+            (Array.isArray(extractedData[field]) && extractedData[field].length === 0)) {
+          extractedData[field] = field === "tags" ? ["Not Found"] : "Not Found";
+        }
+      }
+    }
+
     // --- End detailed logging ---
 
     if (!extractedData) {
@@ -59,7 +67,6 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'No data extracted' }, { status: 404 });
     }
 
-    console.log("API Route: Condition is false, returning 200 with data.");
     return NextResponse.json(extractedData); // Default status is 200
 
   } catch (error) {
