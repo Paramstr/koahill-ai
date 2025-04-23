@@ -12,7 +12,7 @@ interface FirecrawlData {
   location: string;
   tags: string[];
 }
-
+//test
 // Define the structure of the funding item from Supabase
 // Ensure this matches the interface in your API route and your Supabase table
 interface FundingItem {
