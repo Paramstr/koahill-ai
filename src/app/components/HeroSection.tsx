@@ -12,6 +12,26 @@ interface FirecrawlData {
   tags: string[];
 }
 
+// Define the structure of the funding item from Supabase
+// Ensure this matches the interface in your API route and your Supabase table
+interface FundingItem {
+  id: string; // uuid
+  title: string | null;
+  description: string | null;
+  tags: string[] | null; // _text
+  region: string | null;
+  entity_type: string | null;
+  source: string | null;
+  funding_type: string | null;
+  amount_min: number | null; // numeric
+  amount_max: number | null; // numeric
+  deadline: string | null; // date
+  recurring: boolean | null; // bool
+  url: string | null;
+  // embedding: number[] | null; // vector - Likely not needed for display
+  created_at: string; // timestamp
+}
+
 // Add EditableFirecrawlData interface
 interface EditableFirecrawlData extends FirecrawlData {
   isEditing: boolean;
@@ -35,6 +55,11 @@ const HeroSection = () => {
   const [extractedData, setExtractedData] = useState<EditableFirecrawlData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Add state for funding data
+  const [fundingItems, setFundingItems] = useState<FundingItem[]>([]);
+  const [isFundingLoading, setIsFundingLoading] = useState(false);
+  const [fundingError, setFundingError] = useState<string | null>(null);
+
   useEffect(() => {
     const intervalId = setInterval(() => {
       setIndex((prevIndex) => (prevIndex + 1) % texts.length);
@@ -54,6 +79,9 @@ const HeroSection = () => {
     setLoadingPhase('Researching website');
     setError(null);
     setExtractedData(null);
+    // Reset funding state on new search
+    setFundingItems([]);
+    setFundingError(null);
 
     // Set up loading phase timer
     const timer = setTimeout(() => {
@@ -82,11 +110,47 @@ const HeroSection = () => {
         throw new Error(result.error || `API request failed with status ${response.status}`);
       }
 
-      setExtractedData({
+      const currentExtractedData = {
         ...result as FirecrawlData,
         isEditing: false
-      });
+      };
+      setExtractedData(currentExtractedData);
       setLoadingPhase('Done!');
+
+      // --- Fetch funding data after successful extraction ---
+      if (currentExtractedData) {
+        setIsFundingLoading(true);
+        setFundingError(null);
+        try {
+          // Create a string representation of the extracted data for the API
+          // TODO: Refine this string for better relevance matching if needed
+          const dataString = JSON.stringify(currentExtractedData);
+
+          const fundingResponse = await fetch('/api/supabase', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ extractedData: dataString }),
+          });
+
+          const fundingResult = await fundingResponse.json();
+
+          if (!fundingResponse.ok) {
+            throw new Error(fundingResult.error || `Funding API request failed with status ${fundingResponse.status}`);
+          }
+
+          setFundingItems(fundingResult as FundingItem[]);
+
+        } catch (fundingErr) {
+           console.error("Funding fetch failed:", fundingErr);
+           setFundingError(fundingErr instanceof Error ? fundingErr.message : 'Failed to fetch funding data.');
+           setFundingItems([]); // Clear items on error
+        } finally {
+          setIsFundingLoading(false);
+        }
+      }
+      // --- End Fetch funding data ---
 
     } catch (err) {
       console.error("Eligibility check failed:", err);
@@ -115,10 +179,6 @@ const HeroSection = () => {
     });
   };
 
-
-
-
-
   // Helper function to check if a value is "Not Found"
   const isNotFound = (value: string | string[]) => {
     if (Array.isArray(value)) {
@@ -126,6 +186,37 @@ const HeroSection = () => {
       return value.length === 1 && value[0] === "Not Found";
     }
     return value === "Not Found";
+  };
+
+  // Helper function to format amount range
+  const formatAmount = (min: number | null, max: number | null): string => {
+    if (min && max) {
+      if (min === max) return `$${min.toLocaleString()}`;
+      return `$${min.toLocaleString()} - $${max.toLocaleString()}`;
+    } else if (min) {
+      return `From $${min.toLocaleString()}`;
+    } else if (max) {
+      return `Up to $${max.toLocaleString()}`;
+    }
+    return 'N/A';
+  };
+
+  // Helper function to format date
+  const formatDate = (dateString: string | null): string => {
+    if (!dateString) return 'N/A';
+    try {
+      return new Date(dateString).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    } catch (e) {
+      console.error("Error formatting date:", e);
+      return 'Invalid Date';
+    }
+  };
+
+  // Helper function to clean description text
+  const cleanDescription = (description: string | null): string | null => {
+    if (!description) return null;
+    // Remove the content reference markers like &#8203;:contentReference[oaicite:0]{index=0}
+    return description.replace(/&#8203;:contentReference\[.*?\]\{.*?\}/g, '');
   };
 
   return (
@@ -159,9 +250,9 @@ const HeroSection = () => {
           </span>
 
         </h1>
-        <div className="mt-32 fade-background-rect rounded-lg bg-opacity-90 p-4 w-full">
+        <div className="mt-32 fade-background-rect rounded-lg bg-opacity-90 p-4">
 
-        <span className="content-above mt-32 text-gray-800 text-2xl">
+        <span className="content-above mt-32 text-gray-800 text-2xl ">
           Check your eligibility in 60 seconds
         </span>
         </div>
@@ -199,13 +290,13 @@ const HeroSection = () => {
             <p className="text-center text-gray-600 animate-pulse">{loadingPhase}</p>
           )}
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-              <strong className="font-bold">Error: </strong>
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+              <strong className="font-bold">Extraction Error: </strong>
               <span className="block sm:inline">{error}</span>
             </div>
           )}
           {extractedData && (
-            <div className=" fade-background-rect p-6 rounded-lg">
+            <div className=" fade-background-rect p-6 rounded-lg mb-6">
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -221,9 +312,9 @@ const HeroSection = () => {
                     placeholder="Company name"
                   />
                   {isNotFound(extractedData.company_name) && <PencilLine className="ml-2 text-red-600" size={20} />}
-                  <div className="flex items-center">
+                  <div className=" flex items-center">
                     {/* Emoji in a separate span */}
-                    <span className="content-above text-gray-600 mr-1">📍</span>
+                    <span className="content-above text-gray-600">📍</span>
                     <input
                       type="text"
                       value={extractedData.location} // Removed emoji prefix
@@ -252,14 +343,67 @@ const HeroSection = () => {
                     </div>
                   ))}
                 </div>
+                {/* Add input field for tags */}
+                
+                {isNotFound(extractedData.tags) && <PencilLine className="ml-2 text-red-600 inline-block align-middle" size={16} />}
               </motion.div>
             </div>
           )}
         </div>
         {/* End Text Results Area */}
 
-        {/* Start Grant Preview Area */}
-
+        {/* --- Funding Information Section --- */}
+        <div className="w-full max-w-3xl text-left">
+          {isFundingLoading && (
+            <p className="text-center text-gray-600 animate-pulse">Searching for relevant funding...</p>
+          )}
+          {fundingError && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+              <strong className="font-bold">Funding Error: </strong>
+              <span className="block sm:inline">{fundingError}</span>
+            </div>
+          )}
+          {fundingItems.length > 0 && (
+            <div className="mt-4">
+               <h2 className="text-2xl font-semibold mb-4 text-gray-800 text-center">Relevant Funding Opportunities</h2>
+               <div className="space-y-4">
+                 {fundingItems.map((item) => (
+                   <motion.div
+                     key={item.id}
+                     initial={{ opacity: 0, x: -20 }}
+                     animate={{ opacity: 1, x: 0 }}
+                     transition={{ duration: 0.5 }}
+                     className="bg-white p-4 rounded-lg shadow-md border border-gray-200"
+                   >
+                     <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title || 'Funding Opportunity'}</h3>
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                       <p className="text-gray-600"><span className="font-medium text-gray-700">Amount:</span> {formatAmount(item.amount_min, item.amount_max)}</p>
+                       <p className="text-gray-600"><span className="font-medium text-gray-700">Deadline:</span> {formatDate(item.deadline)}</p>
+                       <p className="text-gray-600"><span className="font-medium text-gray-700">Region:</span> {item.region || 'N/A'}</p>
+                       <p className="text-gray-600"><span className="font-medium text-gray-700">Funding Type:</span> {item.funding_type || 'N/A'}</p>
+                     </div>
+                     {item.description && <p className="mt-3 text-gray-700 text-sm">{cleanDescription(item.description)}</p>}
+                     {item.url && (
+                       <a
+                         href={item.url}
+                         target="_blank"
+                         rel="noopener noreferrer"
+                         className="mt-3 inline-block text-blue-600 hover:text-blue-800 hover:underline text-sm"
+                       >
+                         Learn More &rarr;
+                       </a>
+                     )}
+                   </motion.div>
+                 ))}
+               </div>
+            </div>
+          )}
+           {/* Optional: Message if extraction succeeded but no funding found */}
+          {!isFundingLoading && !fundingError && extractedData && fundingItems.length === 0 && (
+               <p className="text-center text-gray-600 mt-4">No relevant funding opportunities found based on the extracted data.</p>
+          )}
+        </div>
+        {/* --- End Funding Information Section --- */}
 
       </div>
     </section>

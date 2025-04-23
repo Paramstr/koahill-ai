@@ -7,13 +7,14 @@ from psycopg2.extras import Json
 
 # Load environment variables
 load_dotenv()
-SUPABASE_DB_URL = os.getenv("SUPABASE_DB_URL")  # e.g. postgres://user:pass@host:port/db
+SUPABASE_PROJECT_URL = os.getenv("SUPABASE_PROJECT_URL")  # e.g. postgres://user:pass@host:port/db
+SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 openai.api_key = OPENAI_API_KEY
 
 # Connect to Supabase (PostgreSQL backend)
-conn = psycopg2.connect(SUPABASE_DB_URL)
+conn = psycopg2.connect(SUPABASE_PROJECT_URL)
 cur = conn.cursor()
 
 # Fetch entries without embedding
