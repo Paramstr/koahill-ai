@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PencilLine } from 'lucide-react';
+import { Banknote, Calendar, MapPin, Layers } from 'lucide-react';
 
 // Define the expected structure of the data returned from the API
 interface FirecrawlData {
@@ -190,15 +191,17 @@ const HeroSection = () => {
 
   // Helper function to format amount range
   const formatAmount = (min: number | null, max: number | null): string => {
+    let amountText = 'N/A';
     if (min && max) {
-      if (min === max) return `$${min.toLocaleString()}`;
-      return `$${min.toLocaleString()} - $${max.toLocaleString()}`;
+      if (min === max) amountText = `$${min.toLocaleString()}`;
+      else amountText = `$${min.toLocaleString()} - $${max.toLocaleString()}`;
     } else if (min) {
-      return `From $${min.toLocaleString()}`;
+      amountText = `From $${min.toLocaleString()}`;
     } else if (max) {
-      return `Up to $${max.toLocaleString()}`;
+      amountText = `Up to $${max.toLocaleString()}`;
     }
-    return 'N/A';
+    // Add currency type if amount is not N/A
+    return amountText !== 'N/A' ? `${amountText} USD` : amountText;
   };
 
   // Helper function to format date
@@ -229,11 +232,13 @@ const HeroSection = () => {
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent z-1 pointer-events-none"></div>
 
       {/* Main container - Centered */}
-      <div className="relative z-10 mx-auto px-4 sm:px-6 lg:px-16 xl:px-24 flex flex-col items-center justify-center text-center max-w-5xl ">
-        <h1 className="--font-abc-favorit text-4xl tracking-tight text-gray-900 sm:text-5xl md:text-5xl xl:text-7xl">
+      <div className=" relative z-10 mx-auto px-4 sm:px-6 lg:px-16 xl:px-24 flex flex-col items-center justify-center text-center max-w-5xl ">
+        <div className="fade-background-rect">
+        <h1 className="content-above --font-abc-favorit text-4xl tracking-tight text-gray-900 sm:text-5xl md:text-5xl xl:text-7xl">
         Find public funding for{' '}
         </h1>
-        <h1 className="font-abc-favorit text-4xl tracking-tight mt-4 text-gray-900 sm:text-5xl md:text-6xl xl:text-7xl">
+        </div>
+        <h1 className="content-above font-abc-favorit text-4xl tracking-tight mt-4 text-gray-900 sm:text-5xl md:text-6xl xl:text-7xl">
           <span className="inline-block h-[1.2em]"> {/* Height container for consistent layout */}
             <AnimatePresence mode="wait">
               <motion.span
@@ -249,7 +254,9 @@ const HeroSection = () => {
             </AnimatePresence>
           </span>
 
+
         </h1>
+        
         <div className="mt-32 fade-background-rect rounded-lg bg-opacity-90 p-4">
 
         <span className="content-above mt-32 text-gray-800 text-2xl ">
@@ -319,9 +326,9 @@ const HeroSection = () => {
                       type="text"
                       value={extractedData.location} // Removed emoji prefix
                       onChange={(e) => handleEdit('location', e.target.value)} // Simplified onChange
-                      className={`content-above bg-transparent outline-none text-gray-600 text-right ${isNotFound(extractedData.location) ? 'text-red-600 underline decoration-red-600' : ''}`}
+                      className={`content-above bg-transparent outline-none text-gray-600 text-right px-2 py-1 ${isNotFound(extractedData.location) ? 'text-red-600 underline decoration-red-600' : ''}`} // Reverted to px-2 py-1
                       placeholder="Location"
-                      style={{ width: `${(extractedData.location?.length || 10) * 0.6}em` }} // Dynamic width based on content
+                      style={{ width: `calc(${(extractedData.location?.length || 10) * 0.6}em + 1.5em)` }} // Adjusted dynamic width for padding
                     />
                      {isNotFound(extractedData.location) && <PencilLine className="ml-2 text-red-600" size={16} />}
                   </div>
@@ -366,36 +373,83 @@ const HeroSection = () => {
           {fundingItems.length > 0 && (
             <div className="mt-4">
                <h2 className="text-2xl font-semibold mb-4 text-gray-800 text-center">Relevant Funding Opportunities</h2>
-               <div className="space-y-4">
-                 {fundingItems.map((item) => (
+               {/* Limit to first 3 items and adjust spacing */}
+               <div className="space-y-3">
+                 {fundingItems.slice(0, 3).map((item) => (
                    <motion.div
                      key={item.id}
                      initial={{ opacity: 0, x: -20 }}
                      animate={{ opacity: 1, x: 0 }}
                      transition={{ duration: 0.5 }}
-                     className="bg-white p-4 rounded-lg shadow-md border border-gray-200"
+                     // Compact styling: reduced padding, border slightly lighter
+                     className="bg-white p-3 rounded-lg shadow-md border border-gray-100 relative flex flex-col justify-between min-h-[160px]" // Added flex, justify-between, min-height
                    >
-                     <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title || 'Funding Opportunity'}</h3>
-                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                       <p className="text-gray-600"><span className="font-medium text-gray-700">Amount:</span> {formatAmount(item.amount_min, item.amount_max)}</p>
-                       <p className="text-gray-600"><span className="font-medium text-gray-700">Deadline:</span> {formatDate(item.deadline)}</p>
-                       <p className="text-gray-600"><span className="font-medium text-gray-700">Region:</span> {item.region || 'N/A'}</p>
-                       <p className="text-gray-600"><span className="font-medium text-gray-700">Funding Type:</span> {item.funding_type || 'N/A'}</p>
+                     <div> {/* Container for top content */}
+                       {/* Amount in top-right corner - Slightly smaller */}
+                       <div className="absolute top-3 right-3 text-green-600 font-bold text-lg flex items-center">
+                         <Banknote size={14} className="mr-1" />
+                         {formatAmount(item.amount_min, item.amount_max)}
+                       </div>
+
+                       {/* Title - Smaller text, less margin, less padding-right */}
+                       <h3 className="text-base font-semibold text-gray-800 mb-1 pr-16">{item.title || 'Funding Opportunity'}</h3>
+
+                       {/* Details Grid - Smaller text, smaller icons, less gap */}
+                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-1 text-xs mt-1">
+                         {/* Deadline */}
+                         <div className="flex items-center text-gray-500">
+                           <Calendar size={12} className="mr-1 text-gray-400" />
+                           <span className="font-medium text-gray-600 mr-1">Deadline:</span> {formatDate(item.deadline)}
+                         </div>
+                         {/* Region */}
+                         <div className="flex items-center text-gray-500">
+                           <MapPin size={12} className="mr-1 text-gray-400" />
+                           <span className="font-medium text-gray-600 mr-1">Region:</span> {item.region || 'N/A'}
+                         </div>
+                         {/* Funding Type */}
+                         <div className="flex items-center text-gray-500">
+                           <Layers size={12} className="mr-1 text-gray-400" />
+                           <span className="font-medium text-gray-600 mr-1">Type:</span> {item.funding_type || 'N/A'}
+                         </div>
+                       </div>
+
+                       {/* Description - Smaller text, less margin */}
+                       {item.description && <p className="mt-2 text-gray-600 text-xs leading-snug">{cleanDescription(item.description)}</p>}
                      </div>
-                     {item.description && <p className="mt-3 text-gray-700 text-sm">{cleanDescription(item.description)}</p>}
+
+                     {/* Button - Replaces link */}
                      {item.url && (
-                       <a
-                         href={item.url}
-                         target="_blank"
-                         rel="noopener noreferrer"
-                         className="mt-3 inline-block text-blue-600 hover:text-blue-800 hover:underline text-sm"
+                       <button
+                         onClick={() => {
+                           if (item.url) { // Explicit check for null/undefined
+                             window.open(item.url, '_blank');
+                           }
+                         }}
+                         className="mt-2 self-end bg-black text-white px-3 py-1 rounded-md text-xs font-medium hover:bg-gray-800 transition-colors duration-200 ease-in-out"
                        >
-                         Learn More &rarr;
-                       </a>
+                         Find out more
+                       </button>
                      )}
                    </motion.div>
                  ))}
                </div>
+
+               {/* Cascading teaser effect */}
+               {fundingItems.length > 3 && (
+                 <div className="relative mt-[-12px] h-16 flex justify-center items-end pointer-events-none"> {/* Overlap slightly */}
+                   {/* Stacked card effect */}
+                   <div className="absolute bottom-0 w-[95%] h-12 bg-white rounded-lg shadow-md border border-gray-200 opacity-60 transform translate-y-2"></div>
+                   <div className="absolute bottom-0 w-[90%] h-12 bg-white rounded-lg shadow-md border border-gray-200 opacity-30 transform translate-y-4"></div>
+                   {/* Optional: Add a button to show more */}
+                   <button
+                     // TODO: Implement functionality to show more cards
+                     onClick={() => console.log('Show more clicked')}
+                     className="absolute bottom-2 z-10 bg-gray-800 text-white px-4 py-1.5 rounded-full text-xs font-medium hover:bg-gray-900 transition pointer-events-auto"
+                   >
+                     Show all {fundingItems.length} opportunities
+                   </button>
+                 </div>
+               )}
             </div>
           )}
            {/* Optional: Message if extraction succeeded but no funding found */}

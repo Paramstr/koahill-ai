@@ -67,7 +67,7 @@ body {
   position: absolute;
   inset: 0;
   border-radius: 0.5rem; /* Matches rounded-lg */
-  background-color: rgba(255, 255, 255, 0.84); /* Increased opacity */
+  background-color: rgba(255, 255, 255, 0.78); /* Increased opacity */
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 75%, transparent 100%),
                       linear-gradient(to right, transparent 0%, black 30%, black 75%, transparent 100%);
   mask-image: linear-gradient(to bottom, transparent 0%, black 60%, black 75%, transparent 100%),
