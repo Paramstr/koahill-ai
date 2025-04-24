@@ -17,6 +17,9 @@ importers:
       framer-motion:
         specifier: ^12.7.4
         version: 12.7.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      iconsax-reactjs:
+        specifier: ^0.0.8
+        version: 0.0.8(react@19.1.0)
       lucide-react:
         specifier: ^0.503.0
         version: 0.503.0(react@19.1.0)
@@ -1548,6 +1551,11 @@ packages:
   https-proxy-agent@7.0.6:
     resolution: {integrity: sha512-vK9P5/iUfdl95AI+JVyUuIcVtd4ofvtrOr3HNtM2yxC9bnMbEdp3x01OhQNnjb8IJYi38VlTE3mBXwcfvywuSw==}
     engines: {node: '>= 14'}
+
+  iconsax-reactjs@0.0.8:
+    resolution: {integrity: sha512-cb+uTMxbkSFNbu8ZclX7BWQVfOWQt8+m/PsDjnsm/H+mcYrnfTYMjHxiof1FB43k7UAgt1ds+0oFeMVKdqyslw==}
+    peerDependencies:
+      react: '*'
 
   iconv-lite@0.4.24:
     resolution: {integrity: sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA==}
@@ -4226,6 +4234,10 @@ snapshots:
       debug: 4.4.0
     transitivePeerDependencies:
       - supports-color
+
+  iconsax-reactjs@0.0.8(react@19.1.0):
+    dependencies:
+      react: 19.1.0
 
   iconv-lite@0.4.24:
     dependencies:

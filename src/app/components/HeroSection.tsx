@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PencilLine } from 'lucide-react';
-import { Banknote, Calendar, MapPin, Layers } from 'lucide-react';
+import { Banknote, Calendar, Layers } from 'lucide-react';
 
 // Define the expected structure of the data returned from the API
 interface FirecrawlData {
@@ -60,6 +60,9 @@ const HeroSection = () => {
   const [fundingItems, setFundingItems] = useState<FundingItem[]>([]);
   const [isFundingLoading, setIsFundingLoading] = useState(false);
   const [fundingError, setFundingError] = useState<string | null>(null);
+
+  // State to track the hovered item ID
+  const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
 
   const missionTextareaRef = useRef<HTMLTextAreaElement>(null); // Create ref for mission textarea
 
@@ -214,22 +217,44 @@ const HeroSection = () => {
     return amountText !== 'N/A' ? `${amountText} USD` : amountText;
   };
 
-  // Helper function to format date
-  const formatDate = (dateString: string | null): string => {
-    if (!dateString) return 'N/A';
-    try {
-      return new Date(dateString).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-    } catch (e) {
-      console.error("Error formatting date:", e);
-      return 'Invalid Date';
-    }
-  };
-
-  // Helper function to clean description text
+  // Helper function to clean description text (Restored)
   const cleanDescription = (description: string | null): string | null => {
     if (!description) return null;
     // Remove the content reference markers like &#8203;:contentReference[oaicite:0]{index=0}
     return description.replace(/&#8203;:contentReference\[.*?\]\{.*?\}/g, '');
+  };
+
+  // Helper function to format deadline into relative time
+  const formatRelativeTime = (dateString: string | null): string => {
+    if (!dateString) return 'N/A';
+    try {
+      const now = new Date();
+      const deadline = new Date(dateString);
+      const diffInMs = deadline.getTime() - now.getTime();
+
+      if (diffInMs < 0) return 'Past'; // Handle past deadlines
+
+      const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+      const diffInDays = Math.floor(diffInHours / 24);
+
+      if (diffInDays > 1) {
+        return `Due in ${diffInDays}d`;
+      } else if (diffInDays === 1) {
+          return `Due in 1d`;
+      } else if (diffInHours > 0) {
+        return `Due in ${diffInHours}h`;
+      } else {
+        const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+          if (diffInMinutes > 0) {
+          return `Due in ${diffInMinutes}m`;
+        } else {
+          return 'Due very soon';
+        }
+      }
+    } catch (e) {
+      console.error("Error formatting relative time:", e);
+      return 'Invalid Date';
+    }
   };
 
   return (
@@ -270,7 +295,7 @@ const HeroSection = () => {
         <div className="mt-32 fade-background-rect rounded-lg bg-opacity-90 p-4">
 
         <span className="content-above mt-32 text-gray-800 text-2xl ">
-          Check your eligibility in 60 seconds
+          Check your eligibility in 30 seconds
         </span>
         </div>
         <div className="mt-2 flex flex-col sm:flex-row gap-4 justify-center items-center w-full max-w-3xl">
@@ -382,90 +407,113 @@ const HeroSection = () => {
             </div>
           )}
           {fundingItems.length > 0 && (
-            <div className="mt-4">
-               <h2 className="text-2xl font-semibold mb-4 text-gray-800 text-center">Relevant Funding Opportunities</h2>
-               {/* Limit to first 3 items and adjust spacing */}
-               <div className="space-y-3">
-                 {fundingItems.slice(0, 3).map((item) => (
-                   <motion.div
-                     key={item.id}
-                     initial={{ opacity: 0, x: -20 }}
-                     animate={{ opacity: 1, x: 0 }}
-                     transition={{ duration: 0.5 }}
-                     // Compact styling: reduced padding, border slightly lighter
-                     className="bg-white p-3 rounded-lg shadow-md border border-gray-100 relative flex flex-col justify-between min-h-[160px]" // Added flex, justify-between, min-height
-                   >
-                     <div> {/* Container for top content */}
-                       {/* Amount in top-right corner - Slightly smaller */}
-                       <div className="absolute top-3 right-3 text-green-600 font-bold text-lg flex items-center">
-                         <Banknote size={14} className="mr-1" />
-                         {formatAmount(item.amount_min, item.amount_max)}
-                       </div>
+            <div className="mt-8"> {/* Increased top margin */}
+               {/* <h2 className="text-2xl font-semibold mb-6 text-gray-800 text-center">Relevant Funding</h2>  */}
+               {/* Limit to first 4 items and adjust spacing */}
+               <div className="space-y-4"> {/* Increased spacing between cards */}
+                 {fundingItems.slice(0, 4).map((item, index) => { // Add index
+                   // Determine blur based on index - Gentler progression
+                   const blurClasses = [
+                     'blur-none',      // Index 0
+                     'blur-[0.5px]',   // Index 1
+                     'blur-[1px]',     // Index 2
+                     'blur-[1.5px]'    // Index 3+
+                   ];
+                   const blurClass = blurClasses[Math.min(index, blurClasses.length - 1)];
 
-                       {/* Title - Smaller text, less margin, less padding-right */}
-                       <h3 className="text-base font-semibold text-gray-800 mb-1 pr-16">{item.title || 'Funding Opportunity'}</h3>
-
-                       {/* Details Grid - Smaller text, smaller icons, less gap */}
-                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-1 text-xs mt-1">
-                         {/* Deadline */}
-                         <div className="flex items-center text-gray-500">
-                           <Calendar size={12} className="mr-1 text-gray-400" />
-                           <span className="font-medium text-gray-600 mr-1">Deadline:</span> {formatDate(item.deadline)}
-                         </div>
-                         {/* Region */}
-                         <div className="flex items-center text-gray-500">
-                           <MapPin size={12} className="mr-1 text-gray-400" />
-                           <span className="font-medium text-gray-600 mr-1">Region:</span> {item.region || 'N/A'}
-                         </div>
-                         {/* Funding Type */}
-                         <div className="flex items-center text-gray-500">
-                           <Layers size={12} className="mr-1 text-gray-400" />
-                           <span className="font-medium text-gray-600 mr-1">Type:</span> {item.funding_type || 'N/A'}
+                   return (
+                     <motion.div
+                       key={item.id}
+                       initial={{ opacity: 0, y: 20 }} // Start slightly lower
+                       animate={{ opacity: 1, y: 0 }}
+                       transition={{ duration: 0.5, ease: "easeOut" }} // Smoother ease
+                       // Add hover handlers
+                       onMouseEnter={() => setHoveredItemId(item.id)}
+                       onMouseLeave={() => setHoveredItemId(null)}
+                       // Apply progressive content blur, remove backdrop-blur
+                       className={`bg-white/50 ${blurClass} p-4 rounded-xl shadow-md border border-gray-200/50 flex items-start justify-between hover:shadow-xl transition-shadow duration-300 overflow-hidden`} // Added items-start and overflow-hidden, changed to rounded-xl
+                     >
+                       {/* Left Icon/Placeholder */}
+                       <div className="flex-shrink-0 mr-4 mt-1"> {/* Added mt-1 for alignment */}
+                         {/* Placeholder Icon - Replace with actual logos if available */}
+                         {/* Example using Layers icon, adjust as needed */}
+                         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
+                           {/* You could conditionally render different icons based on item.funding_type or source */}
+                           <Layers size={24} className="text-indigo-500" />
                          </div>
                        </div>
 
-                       {/* Description - Smaller text, less margin */}
-                       {item.description && <p className="mt-2 text-gray-600 text-xs leading-snug">{cleanDescription(item.description)}</p>}
-                     </div>
+                       {/* Middle Content */}
+                       <div className="flex-grow mr-4">
+                         <h3 className="text-lg font-semibold text-gray-900 mb-0.5">{item.title || 'Funding Opportunity'}</h3>
+                         <p className="text-sm text-gray-600 mb-1.5">{item.source || 'Unknown Source'}</p> {/* Added source */}
+                         {/* Metadata Row */}
+                         <div className="flex items-center space-x-3 text-xs text-gray-500">
+                           {item.funding_type && (
+                             <div className="flex items-center">
+                               <Layers size={12} className="mr-1 text-gray-400" />
+                               <span>{item.funding_type}</span>
+                             </div>
+                           )}
+                           <div className="flex items-center">
+                             <Calendar size={12} className="mr-1 text-gray-400" />
+                             <span>{formatRelativeTime(item.deadline)}</span> {/* Use relative time */}
+                           </div>
+                           {/* Optional: Status Indicator Dot */}
+                           {/* Example: Add a green dot if deadline is far, yellow if near, red if past */}
+                           {/* <span className="w-2 h-2 bg-green-500 rounded-full ml-1"></span> */}
+                         </div>
+                         {/* Conditionally render description on hover */}
+                         <AnimatePresence>
+                           {hoveredItemId === item.id && item.description && (
+                             <motion.p
+                               initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                               animate={{ opacity: 1, height: 'auto', marginTop: '0.5rem' }} // Add margin-top on animate
+                               exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                               // Adjust transition for smoother feel
+                               transition={{ duration: 0.6, ease: "easeInOut" }} // Increased duration from 0.2
+                               className="text-xs text-gray-500 leading-snug overflow-hidden" // Added overflow-hidden
+                             >
+                               {cleanDescription(item.description)}
+                             </motion.p>
+                           )}
+                         </AnimatePresence>
+                       </div>
 
-                     {/* Button - Replaces link */}
-                     {item.url && (
-                       <button
-                         onClick={() => {
-                           if (item.url) { // Explicit check for null/undefined
-                             window.open(item.url, '_blank');
-                           }
-                         }}
-                         className="mt-2 self-end bg-black text-white px-3 py-1 rounded-md text-xs font-medium hover:bg-gray-800 transition-colors duration-200 ease-in-out"
-                       >
-                         Find out more
-                       </button>
-                     )}
-                   </motion.div>
-                 ))}
+                       {/* Right Amount & Button */}
+                       <div className="flex flex-col items-end justify-between flex-shrink-0">
+                         {/* Amount */}
+                         <div className="text-xl font-bold text-green-700 flex items-center mb-2"> {/* Made amount larger and bolder */}
+                           <Banknote size={18} className="mr-1.5" />
+                           {formatAmount(item.amount_min, item.amount_max).replace(' USD','')} {/* Removed USD suffix for cleaner look */}
+                           <span className="text-sm font-medium text-green-600 ml-1">USDC</span> {/* Explicitly add USDC */}
+                         </div>
+                       </div>
+
+                     </motion.div>
+                   );
+                 })}
                </div>
 
-               {/* Cascading teaser effect */}
-               {fundingItems.length > 3 && (
-                 <div className="relative mt-[-12px] h-16 flex justify-center items-end pointer-events-none"> {/* Overlap slightly */}
-                   {/* Stacked card effect */}
-                   <div className="absolute bottom-0 w-[95%] h-12 bg-white rounded-lg shadow-md border border-gray-200 opacity-60 transform translate-y-2"></div>
-                   <div className="absolute bottom-0 w-[90%] h-12 bg-white rounded-lg shadow-md border border-gray-200 opacity-30 transform translate-y-4"></div>
-                   {/* Optional: Add a button to show more */}
-                   <button
-                     // TODO: Implement functionality to show more cards
-                     onClick={() => console.log('Show more clicked')}
-                     className="absolute bottom-2 z-10 bg-gray-800 text-white px-4 py-1.5 rounded-full text-xs font-medium hover:bg-gray-900 transition pointer-events-auto"
-                   >
-                     Show all {fundingItems.length} opportunities
-                   </button>
-                 </div>
-               )}
+               {/* Cascading teaser effect & CTA Button */}
+               <div className="relative mt-4 h-28 flex justify-center"> {/* Removed items-center */} 
+                 {/* Stacked card effect - use translucent background */}
+                 <div className="absolute bottom-12 w-[95%] h-16 bg-white/70 backdrop-blur-sm rounded-xl shadow-md border border-gray-200/50 opacity-70 transform translate-y-2 pointer-events-none"></div> {/* Adjusted bottom offset, changed to rounded-xl */}
+                 <div className="absolute bottom-12 w-[90%] h-16 bg-white/60 backdrop-blur-sm rounded-xl shadow-md border border-gray-200/40 opacity-40 transform translate-y-4 pointer-events-none"></div> {/* Adjusted bottom offset, changed to rounded-xl */}
+
+                 {/* CTA Button - Enhanced Translucent Gradient */}
+                 <button
+                   onClick={() => console.log('Show more clicked')} // Keep existing onClick for now
+                   className="absolute z-10 bottom-15 bg-gradient-to-br from-gray-700/90 to-black/90 backdrop-blur-sm text-white px-8 py-3 rounded-lg text-base font-semibold hover:from-gray-700 hover:to-black transition duration-300 ease-in-out shadow-lg hover:shadow-xl transform hover:scale-105" // Increased gradient contrast and opacity, adjusted hover
+                 >
+                   Explore More Funding
+                 </button>
+               </div>
             </div>
           )}
            {/* Optional: Message if extraction succeeded but no funding found */}
           {!isFundingLoading && !fundingError && extractedData && fundingItems.length === 0 && (
-               <p className="text-center text-gray-600 mt-4">No relevant funding opportunities found based on the extracted data.</p>
+               <p className="text-center text-gray-600 mt-6">No relevant funding opportunities found based on the extracted data.</p>
           )}
         </div>
         {/* --- End Funding Information Section --- */}
