@@ -75,7 +75,7 @@ const HeroSection = () => {
                 priority
               />
               {/* Grant 1 SVG */}
-              <div className="absolute top-1/3 -left-14 z-10 w-170 h-85 transform -translate-y-1/2">
+              <div className="absolute top-1/4 -left-14 z-10 w-190 h-85 transform -translate-y-1/2">
                 <Image
                   src="/hero section/grant 1.png"
                   alt="Grant 1"
@@ -84,7 +84,7 @@ const HeroSection = () => {
                 />
               </div>
               {/* Grant 2 SVG */}
-              <div className="absolute top-3/4 -left-14 z-10 w-170 h-85 transform -translate-y-1/2">
+              <div className="mb-12 absolute top-5/7 -left-14 z-10 w-190 h-85 transform -translate-y-1/2">
                 <Image
                   src="/hero section/grant 2.png"
                   alt="Grant 2"
