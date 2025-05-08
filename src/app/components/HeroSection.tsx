@@ -37,7 +37,7 @@ const HeroSection = () => {
         <div className="lg:w-1/2 align-text-top lg:text-left lg:mr-12">
           <div className="fade-background-rect">
             <h1 className="content-above --font-abc-favorit text-6xl tracking-tight text-gray-900 sm:text-5xl md:text-5xl xl:text-7xl">
-              Helping Startups discover
+              Helping startups discover
             </h1>
             <h1 className="content-above --font-abc-favorit text-5xl tracking-tight text-gray-700 sm:text-4xl md:text-4xl xl:text-7xl mt-2">
               <span className="inline-block h-[1.2em]">
