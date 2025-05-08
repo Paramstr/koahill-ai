@@ -24,21 +24,12 @@ const detailsSection = () => {
               {/* Text content */}
               <div className="relative z-10">
                 <h1 className="text-4xl font-medium tracking-tight text-gray-900 sm:text-5xl md:text-6xl xl:text-7xl">
-                  <span className="block">Innovation should be rewarded</span>
+                  <span className="block">Openly Funded</span>
                 </h1>
                 <p className="mt-8 text-lg text-gray-600 leading-relaxed xl:text-xl max-w-2xl">
-                  We agree.
+                  
                 </p>
-                <div className="mt-12 flex flex-col sm:flex-row gap-4">
-                  <button className="rounded-lg bg-black px-8 py-3 text-base font-medium text-white hover:bg-gray-800 transition-colors duration-150 ease-in-out">
-                    Check eligibility
-                  </button>
-                  <Link href="/demopage">
-                    <button className="rounded-lg border border-gray-300 bg-white px-8 py-3 text-base font-medium text-black hover:bg-gray-50 transition-colors duration-150 ease-in-out cursor-pointer">
-                      Join waitlist →
-                    </button>
-                  </Link>
-                </div>
+                
               </div>
             </div>
           </div>
